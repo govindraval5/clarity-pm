@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clarity — PM Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Lora:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════
+   FOUNDATION
+════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background: var(--bg);
+  color: var(--ink);
+  transition: background .25s, color .2s;
+  overflow: hidden;
+  height: 100vh;
+}
+button, textarea, input { font-family: inherit; outline: none; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 4px; }
+
+/* ════════════════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════════════════ */
+body {
+  /* Light */
+  --bg:      #F7F8FA;
+  --surface: #FFFFFF;
+  --ink:     #0D0F12;
+  --ink2:    #5C626E;
+  --ink3:    #9BA3AF;
+  --line:    #EAECF0;
+  --line2:   #D0D5DD;
+  --blue:    #2563EB;
+  --blue-s:  rgba(37,99,235,.07);
+  --blue-b:  rgba(37,99,235,.16);
+  --teal:    #0891B2;
+  --teal-s:  rgba(8,145,178,.07);
+  --green:   #059669;
+  --green-s: rgba(5,150,105,.07);
+  --green-b: rgba(5,150,105,.18);
+  --amber:   #D97706;
+  --amber-s: rgba(217,119,6,.07);
+  --red:     #DC2626;
+  --red-s:   rgba(220,38,38,.07);
+  --red-b:   rgba(220,38,38,.15);
+  --purple:  #7C3AED;
+  --purple-s:rgba(124,58,237,.07);
+  --rose:    #E11D48;
+  --rose-s:  rgba(225,29,72,.07);
+  --lime:    #65A30D;
+  --lime-s:  rgba(101,163,13,.07);
+  --sh:      0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --sh2:     0 4px 16px rgba(0,0,0,.06);
+  --sh3:     0 12px 40px rgba(0,0,0,.08);
+}
+body.dark {
+  --bg:      #0B0D11;
+  --surface: #13161E;
+  --ink:     #EEF0F5;
+  --ink2:    #7C8494;
+  --ink3:    #3E4452;
+  --line:    #1C2030;
+  --line2:   #272D3C;
+  --blue:    #4D8EF5;
+  --blue-s:  rgba(77,142,245,.09);
+  --blue-b:  rgba(77,142,245,.22);
+  --teal:    #22D3EE;
+  --teal-s:  rgba(34,211,238,.08);
+  --green:   #10B981;
+  --green-s: rgba(16,185,129,.08);
+  --green-b: rgba(16,185,129,.2);
+  --amber:   #FBBF24;
+  --amber-s: rgba(251,191,36,.08);
+  --red:     #F87171;
+  --red-s:   rgba(248,113,113,.08);
+  --red-b:   rgba(248,113,113,.18);
+  --purple:  #A78BFA;
+  --purple-s:rgba(167,139,250,.08);
+  --rose:    #FB7185;
+  --rose-s:  rgba(251,113,133,.08);
+  --lime:    #A3E635;
+  --lime-s:  rgba(163,230,53,.08);
+  --sh:      0 1px 3px rgba(0,0,0,.4);
+  --sh2:     0 4px 16px rgba(0,0,0,.35);
+  --sh3:     0 12px 40px rgba(0,0,0,.5);
+}
+
+/* ════════════════════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════════════════════ */
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes spin   { to   { transform:rotate(360deg); } }
+@keyframes pop    { 0%{opacity:0;transform:scale(.9)} 65%{transform:scale(1.04)} 100%{opacity:1;transform:scale(1)} }
+@keyframes barIn  { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+
+/* ════════════════════════════════════════════════════
+   LAYOUT SHELL
+════════════════════════════════════════════════════ */
+.shell { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+
+/* ─── TOP BAR ────────────────────────────────────── */
+.bar {
+  height: 54px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 4px;
+  position: relative;
+  z-index: 50;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; margin-right: 20px; flex-shrink: 0;
+}
+.logo-gem {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 14px;
+  letter-spacing: -.5px;
+}
+.logo-word {
+  font-size: 16px; font-weight: 700;
+  color: var(--ink); letter-spacing: -.4px;
+}
+
+.tab {
+  height: 36px; padding: 0 14px;
+  border-radius: 8px; border: none; background: none;
+  font-size: 13.5px; font-weight: 500; color: var(--ink2);
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--ink); background: var(--bg); }
+.tab.active { color: var(--blue); background: var(--blue-s); font-weight: 600; }
+.tab-badge {
+  background: var(--blue); color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 10px;
+  animation: pop .25s ease;
+}
+
+.bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.toggle-pill {
+  display: flex; background: var(--bg);
+  border: 1px solid var(--line2); border-radius: 20px; padding: 3px;
+}
+.tp-opt {
+  padding: 4px 12px; border-radius: 16px;
+  font-size: 12px; font-weight: 500; color: var(--ink3);
+  cursor: pointer; transition: all .15s; user-select: none;
+}
+.tp-opt.on { background: var(--surface); color: var(--ink); box-shadow: var(--sh); }
+
+.btn-start {
+  padding: 7px 18px; border-radius: 8px;
+  background: var(--blue); color: #fff; border: none;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all .15s;
+}
+.btn-start:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,.3); }
+.btn-start:active { transform: scale(.98); }
+
+/* ─── MAIN BODY ──────────────────────────────────── */
+.content { flex: 1; overflow: hidden; display: flex; }
+
+/* ─── PAGE SWITCHING ─────────────────────────────── */
+.pg { display: none; flex: 1; overflow-y: auto; }
+.pg.on { display: flex; flex-direction: column; animation: fadeIn .2s ease; }
+
+/* ════════════════════════════════════════════════════
+   HOME PAGE
+════════════════════════════════════════════════════ */
+.home-inner {
+  max-width: 880px; margin: 0 auto;
+  padding: 64px 40px 100px; width: 100%;
+}
+
+.home-kicker {
+  font-size: 11.5px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--blue);
+  display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+}
+.home-kicker::before { content:''; width:16px; height:2px; background:var(--blue); border-radius:1px; }
+
+.home-h1 {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 50px; font-weight: 400; line-height: 1.1;
+  letter-spacing: -1px; color: var(--ink);
+  margin-bottom: 20px;
+}
+.home-h1 em { font-style: italic; color: var(--blue); }
+
+.home-p {
+  font-size: 17px; font-weight: 300; color: var(--ink2);
+  line-height: 1.75; max-width: 520px; margin-bottom: 40px;
+}
+
+.home-btns { display:flex; gap:12px; margin-bottom:80px; align-items:center; }
+.btn-primary {
+  padding: 12px 28px; border-radius: 10px;
+  background: var(--blue); color: #fff; border: none;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: all .15s;
+}
+.btn-primary:hover { opacity:.88; transform:translateY(-1px); box-shadow:0 6px 20px rgba(37,99,235,.3); }
+.btn-primary:active { transform:scale(.98); }
+.btn-ghost {
+  padding: 12px 22px; border-radius: 10px;
+  border: 1px solid var(--line2); background: none;
+  font-size: 15px; font-weight: 500; color: var(--ink2);
+  cursor: pointer; transition: all .15s;
+}
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-s); }
+
+/* Input type cards */
+.inputs-heading {
+  font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--ink3); margin-bottom: 16px;
+}
+.input-tiles {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 10px; margin-bottom: 64px;
+}
+.inp-tile {
+  padding: 20px 14px 18px;
+  border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface); cursor: pointer;
+  transition: all .18s; text-align: center;
+  position: relative; overflow: hidden;
+}
+.inp-tile::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 0;
+  background: var(--c);
+  transition: height .2s ease;
+  opacity: .12;
+}
+.inp-tile:hover { transform: translateY(-3px); box-shadow: var(--sh2); border-color: var(--c); }
+.inp-tile:hover::before { height: 100%; }
+.inp-tile:hover .inp-name { color: var(--c); }
+.inp-icon { font-size: 26px; margin-bottom: 10px; display: block; transition: transform .2s; }
+.inp-tile:hover .inp-icon { transform: scale(1.1); }
+.inp-name { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 3px; transition: color .18s; }
+.inp-desc { font-size: 10.5px; color: var(--ink3); line-height: 1.45; }
+
+/* How it works */
+.how-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  border: 1px solid var(--line); border-radius: 14px;
+  overflow: hidden; background: var(--surface);
+}
+.how-cell {
+  padding: 26px 22px; border-right: 1px solid var(--line);
+  transition: background .15s;
+}
+.how-cell:last-child { border-right: none; }
+.how-cell:hover { background: var(--bg); }
+.how-num {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 12px;
+  font-family: monospace;
+}
+.how-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.how-body { font-size: 12.5px; color: var(--ink3); line-height: 1.6; }
+
+/* ════════════════════════════════════════════════════
+   ANALYZE PAGE — SPLIT PANEL
+════════════════════════════════════════════════════ */
+.split { display:flex; flex:1; overflow:hidden; height:100%; }
+
+/* ── LEFT PANEL ──────────────────────────────────── */
+.lp {
+  width: 390px; flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.lp-head {
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--line); flex-shrink: 0;
+}
+.lp-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.lp-sub { font-size: 12.5px; color: var(--ink3); line-height: 1.5; }
+
+.lp-body { flex: 1; overflow-y: auto; padding: 14px 18px; }
+
+/* Source accordion items */
+.src {
+  border: 1px solid var(--line); border-radius: 10px;
+  margin-bottom: 7px; overflow: hidden; background: var(--bg);
+  transition: border-color .15s, box-shadow .15s;
+}
+.src.open {
+  border-color: var(--c, var(--blue));
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c, var(--blue)) 7%, transparent);
+}
+.src-hd {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 13px; cursor: pointer; user-select: none;
+  transition: background .12s;
+}
+.src-hd:hover { background: color-mix(in srgb, var(--c, var(--blue)) 4%, var(--bg)); }
+.src.open .src-hd { background: transparent; }
+.src-pip {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--c, var(--ink3)); flex-shrink: 0;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.src.open .src-pip { transform: scale(1.5); }
+.src-ico { font-size: 14px; flex-shrink: 0; }
+.src-nm  { font-size: 13px; font-weight: 500; color: var(--ink); flex: 1; }
+.src-ok {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--green); color: #fff;
+  font-size: 8px; font-weight: 800;
+  display: none; align-items: center; justify-content: center;
+  flex-shrink: 0; animation: pop .2s ease;
+}
+.src-ok.show { display: flex; }
+.src-chev { font-size: 9px; color: var(--ink3); transition: transform .2s; flex-shrink: 0; }
+.src.open .src-chev { transform: rotate(180deg); }
+
+.src-bd { display:none; padding: 0 13px 13px; }
+.src.open .src-bd { display:block; animation: fadeUp .18s ease; }
+
+.src-ta {
+  width: 100%; border: 1px solid var(--line);
+  border-radius: 7px; background: var(--bg);
+  color: var(--ink); font-size: 12.5px; line-height: 1.7;
+  resize: vertical; min-height: 86px; padding: 10px 12px;
+  margin-bottom: 7px; transition: border-color .15s, background .15s;
+}
+.src-ta::placeholder { color: var(--ink3); }
+.src-ta:focus { border-color: var(--c, var(--blue)); background: var(--surface); }
+
+.src-row { display:flex; align-items:center; gap:8px; margin-bottom:9px; }
+.src-cnt { font-size: 11px; color: var(--ink3); }
+.src-ex {
+  font-size: 11px; font-weight: 500; color: var(--blue);
+  background: none; border: none; cursor: pointer; padding: 0;
+  transition: opacity .12s;
+}
+.src-ex:hover { opacity: .6; }
+.src-clr {
+  margin-left: auto; font-size: 11px; color: var(--ink3);
+  background: none; border: none; cursor: pointer; padding: 0;
+  transition: color .12s;
+}
+.src-clr:hover { color: var(--red); }
+
+/* Drop zone */
+.dz {
+  border: 1.5px dashed var(--line2); border-radius: 8px;
+  padding: 13px; text-align: center; cursor: pointer;
+  transition: all .15s; background: var(--bg);
+}
+.dz:hover, .dz.drag { border-color: var(--blue); background: var(--blue-s); }
+.dz input { display: none; }
+.dz-ico { font-size: 16px; opacity: .4; margin-bottom: 3px; transition: opacity .15s; }
+.dz:hover .dz-ico, .dz.drag .dz-ico { opacity: .8; }
+.dz-txt { font-size: 11.5px; color: var(--ink3); }
+.dz-txt b { color: var(--blue); font-weight: 500; }
+.chps { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+.chp {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--blue-s); border: 1px solid var(--blue-b);
+  border-radius: 5px; padding: 2px 6px 2px 8px;
+  font-size: 11px; color: var(--blue); font-weight: 500;
+  animation: pop .2s ease;
+}
+.chp-x {
+  background: none; border: none; color: var(--ink3);
+  cursor: pointer; font-size: 13px; line-height: 1; padding: 0;
+  transition: color .12s;
+}
+.chp-x:hover { color: var(--red); }
+
+/* Goals */
+.lp-goals { padding: 13px 18px 15px; border-top: 1px solid var(--line); flex-shrink: 0; }
+.goals-lbl {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--ink3); margin-bottom: 9px;
+}
+.goal-wrap { display:flex; flex-wrap:wrap; gap:6px; }
+.g-btn {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--line2); background: none;
+  font-size: 12px; font-weight: 500; color: var(--ink2);
+  cursor: pointer; transition: all .12s;
+}
+.g-btn:hover { border-color: var(--blue); color: var(--blue); }
+.g-btn.on { background: var(--blue-s); border-color: var(--blue-b); color: var(--blue); }
+
+/* Footer / Analyze button */
+.lp-foot { padding: 13px 18px; border-top: 1px solid var(--line); flex-shrink: 0; }
+.btn-run {
+  width: 100%; padding: 11px;
+  background: var(--blue); color: #fff;
+  border: none; border-radius: 9px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-run:not([disabled]):hover { opacity: .88; box-shadow: 0 4px 16px rgba(37,99,235,.3); }
+.btn-run:not([disabled]):active { transform: scale(.99); }
+.btn-run[disabled] { opacity: .35; cursor: not-allowed; }
+.run-hint { font-size: 11.5px; color: var(--ink3); text-align: center; margin-top: 7px; }
+
+/* ── RIGHT PANEL ─────────────────────────────────── */
+.rp { flex: 1; overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
+
+.rp-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 60px 48px;
+}
+.rp-empty-icon {
+  width: 60px; height: 60px; border-radius: 16px;
+  background: var(--blue-s); border: 1px solid var(--blue-b);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 20px;
+}
+.rp-empty-t { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.rp-empty-s { font-size: 13.5px; color: var(--ink3); line-height: 1.6; max-width: 260px; }
+
+.rp-spin {
+  display: none; flex: 1; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+}
+.rp-spin.on { display: flex; animation: fadeIn .2s ease; }
+.spin-r {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3px solid var(--line2); border-top-color: var(--blue);
+  animation: spin .75s linear infinite;
+}
+.spin-t  { font-size: 14px; font-weight: 600; color: var(--ink); }
+.spin-s  { font-size: 12.5px; color: var(--ink3); line-height: 1.6; text-align: center; }
+
+/* Results */
+.rp-res { display: none; padding: 30px 34px 60px; }
+.rp-res.on { display: block; animation: fadeUp .3s ease; }
+
+.conf {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; letter-spacing: .4px;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
+  margin-bottom: 20px;
+}
+.conf-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.conf.high   { background:var(--green-s); color:var(--green); border:1px solid var(--green-b); }
+.conf.medium { background:var(--amber-s); color:var(--amber); border:1px solid color-mix(in srgb,var(--amber) 25%,transparent); }
+.conf.low    { background:var(--red-s);   color:var(--red);   border:1px solid var(--red-b); }
+
+.res-sum {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 18px; line-height: 1.65; color: var(--ink);
+  font-weight: 400; margin-bottom: 32px;
+  padding-bottom: 26px; border-bottom: 1px solid var(--line);
+}
+
+.res-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--ink3); margin-bottom: 12px;
+}
+
+/* Theme cards */
+.th-card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-left: 3px solid var(--sc);
+  border-radius: 10px; padding: 15px 17px; margin-bottom: 9px;
+  transition: box-shadow .15s; animation: fadeUp .3s ease both;
+}
+.th-card:hover { box-shadow: var(--sh2); }
+.th-top { display:flex; align-items:flex-start; gap:9px; margin-bottom:7px; }
+.th-nm  { font-size: 14px; font-weight: 700; color: var(--ink); flex: 1; line-height: 1.35; }
+.sev {
+  font-size: 10px; font-weight: 700; padding: 2px 8px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: .3px; flex-shrink: 0;
+}
+.sev-c { background:var(--red-s);   color:var(--red); }
+.sev-h { background:var(--amber-s); color:var(--amber); }
+.sev-m { background:var(--blue-s);  color:var(--blue); }
+.sev-l { background:var(--green-s); color:var(--green); }
+.th-desc {
+  font-size: 12.5px; color: var(--ink2); line-height: 1.6;
+  margin-bottom: 9px; padding-left: 12px;
+}
+.th-quote {
+  font-size: 12px; color: var(--ink3); font-style: italic; line-height: 1.6;
+  padding: 7px 12px; border-left: 2px solid var(--line2);
+  background: var(--bg); border-radius: 0 6px 6px 0; margin-bottom: 9px;
+}
+.th-action {
+  font-size: 12px; font-weight: 500; color: var(--green);
+  padding: 7px 11px; background: var(--green-s); border-radius: 6px;
+  border: 1px solid var(--green-b); line-height: 1.5;
+}
+
+/* Score bars */
+.sc-row { display:flex; align-items:center; gap:12px; padding:7px 0; border-bottom:1px solid var(--line); }
+.sc-row:last-child { border:none; }
+.sc-nm { font-size: 12.5px; color: var(--ink2); width: 165px; flex-shrink: 0; }
+.sc-bar { flex:1; height:4px; background:var(--line); border-radius:2px; overflow:hidden; }
+.sc-fill {
+  height: 100%; border-radius: 2px;
+  transform-origin: left; animation: barIn .9s cubic-bezier(.4,0,.2,1) both;
+}
+.sc-val { font-size:11.5px; font-weight:600; color:var(--ink3); width:26px; text-align:right; font-family:monospace; }
+
+/* Priority rows */
+.pri-row {
+  display: flex; align-items: flex-start; gap: 11px;
+  padding: 11px 0; border-bottom: 1px solid var(--line);
+  animation: fadeUp .3s ease both;
+}
+.pri-row:last-child { border: none; }
+.track {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; padding: 3px 8px; border-radius: 5px;
+  flex-shrink: 0; margin-top: 2px; font-family: monospace;
+}
+.tr-now  { background:var(--amber-s); color:var(--amber); }
+.tr-next { background:var(--blue-s);  color:var(--blue); }
+.tr-later{ background:var(--bg); border:1px solid var(--line2); color:var(--ink3); }
+.pri-nm { font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.pri-why { font-size: 12px; color: var(--ink3); line-height: 1.5; margin-bottom: 5px; }
+.pri-meta { display:flex; gap:12px; font-size:11px; color:var(--ink3); }
+.e-lo { color: var(--green); font-weight:600; }
+.e-md { color: var(--amber); font-weight:600; }
+.e-hi { color: var(--red);   font-weight:600; }
+
+/* Decision block */
+.dec {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 12px; padding: 22px; margin-bottom: 18px;
+  position: relative; overflow: hidden;
+}
+.dec::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+}
+.dec-q   { font-size:16px; font-weight:700; color:var(--ink); margin-bottom:9px; line-height:1.4; }
+.dec-ctx { font-size:13px; color:var(--ink2); line-height:1.65; margin-bottom:16px; }
+.dec-opts { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:13px; }
+.dec-opt { padding:13px 15px; background:var(--bg); border-radius:8px; border:1px solid var(--line); }
+.dec-opt-l { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--ink3); margin-bottom:5px; }
+.dec-opt-v { font-size:13px; color:var(--ink2); line-height:1.55; }
+.dec-rec {
+  padding: 13px 15px; border-radius: 8px; margin-bottom: 15px;
+  background: linear-gradient(135deg, var(--green-s), var(--blue-s));
+  border: 1px solid var(--green-b);
+}
+.dec-rec-l { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--green); margin-bottom:5px; }
+.dec-rec-v { font-size:13.5px; color:var(--ink); line-height:1.65; font-weight:500; }
+.btn-save {
+  padding: 9px 20px; background: var(--ink); color: var(--surface);
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity .15s;
+}
+.btn-save:hover { opacity: .75; }
+
+/* ════════════════════════════════════════════════════
+   DECISIONS PAGE
+════════════════════════════════════════════════════ */
+.pg-inner { max-width: 680px; margin: 0 auto; padding: 40px 36px 80px; width: 100%; }
+.pg-h { font-size: 26px; font-weight: 800; letter-spacing: -.5px; color: var(--ink); margin-bottom: 6px; }
+.pg-s { font-size: 14px; color: var(--ink3); margin-bottom: 32px; line-height: 1.55; }
+
+.dl-empty {
+  text-align: center; padding: 60px 40px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+}
+.dl-empty-ico { font-size: 34px; margin-bottom: 16px; opacity: .3; }
+.dl-empty-h { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.dl-empty-p { font-size: 13.5px; color: var(--ink3); line-height: 1.65; margin-bottom: 22px; }
+
+.dl-card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 14px; padding: 22px; margin-bottom: 13px;
+  animation: fadeUp .3s ease both; transition: box-shadow .15s;
+}
+.dl-card:hover { box-shadow: var(--sh3); }
+.dl-id { font-size:10px; font-weight:700; font-family:monospace; letter-spacing:1px; color:var(--ink3); margin-bottom:8px; }
+.dl-q  { font-size:16px; font-weight:700; color:var(--ink); margin-bottom:8px; line-height:1.4; }
+.dl-ctx{ font-size:13px; color:var(--ink2); line-height:1.65; margin-bottom:15px; }
+.dl-opts{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:11px; }
+.dl-opt { padding:11px 13px; background:var(--bg); border-radius:8px; border:1px solid var(--line); }
+.dl-opt-l { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--ink3); margin-bottom:5px; }
+.dl-opt-v { font-size:12.5px; color:var(--ink2); line-height:1.5; }
+.dl-rec { padding:11px 13px; background:var(--green-s); border:1px solid var(--green-b); border-radius:8px; font-size:13px; color:var(--green); line-height:1.6; }
+.dl-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:13px; }
+.dl-tag  { font-size:11px; padding:3px 9px; border-radius:20px; background:var(--bg); border:1px solid var(--line); color:var(--ink3); font-weight:500; }
+
+/* ════════════════════════════════════════════════════
+   GUIDE PAGE
+════════════════════════════════════════════════════ */
+.g-step { display:flex; gap:18px; margin-bottom:28px; animation: fadeUp .35s ease both; }
+.g-num {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--blue-s); border: 1px solid var(--blue-b);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--blue);
+  font-family: monospace; flex-shrink: 0;
+}
+.g-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+.g-desc  { font-size: 13.5px; color: var(--ink2); line-height: 1.7; }
+
+/* ════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--ink); color: var(--surface);
+  padding: 10px 22px; border-radius: 9px;
+  font-size: 13.5px; font-weight: 500;
+  opacity: 0; pointer-events: none;
+  transition: all .22s ease; white-space: nowrap;
+  z-index: 999; box-shadow: var(--sh3);
+}
+.toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ── TOP BAR ── -->
+  <header class="bar">
+    <div class="logo" onclick="go('home')">
+      <div class="logo-gem">C</div>
+      <span class="logo-word">Clarity</span>
+    </div>
+
+    <button class="tab active" id="n-home"      onclick="go('home')">Home</button>
+    <button class="tab"        id="n-analyze"   onclick="go('analyze')">Analyze</button>
+    <button class="tab"        id="n-decisions" onclick="go('decisions')">
+      Decisions
+      <span class="tab-badge" id="badge" style="display:none">0</span>
+    </button>
+    <button class="tab"        id="n-guide"     onclick="go('guide')">Guide</button>
+
+    <div class="bar-right">
+      <div class="toggle-pill">
+        <div class="tp-opt on" id="tl" onclick="setTheme('light')">☀ Light</div>
+        <div class="tp-opt"    id="td" onclick="setTheme('dark')" >🌙 Dark</div>
+      </div>
+      <button class="btn-start" onclick="go('analyze')">Start analyzing →</button>
+    </div>
+  </header>
+
+  <!-- ── CONTENT ── -->
+  <div class="content">
+
+    <!-- ══════ HOME ══════ -->
+    <div class="pg on" id="p-home">
+      <div class="home-inner">
+
+        <div class="home-kicker">PM Decision Intelligence</div>
+
+        <h1 class="home-h1">
+          Turn feedback into<br><em>clear decisions</em>
+        </h1>
+
+        <p class="home-p">Paste your user research, Jira tickets, analytics, and NPS data. Get back AI-powered themes, priorities, and the one decision you need to make — in seconds.</p>
+
+        <div class="home-btns">
+          <button class="btn-primary" onclick="go('analyze')">Start analyzing →</button>
+          <button class="btn-ghost"   onclick="go('guide')">How it works</button>
+        </div>
+
+        <div class="inputs-heading">Works with every PM input</div>
+        <div class="input-tiles" id="home-tiles"></div>
+
+        <div class="how-row">
+          <div class="how-cell">
+            <div class="how-num">01</div>
+            <div class="how-title">Paste or upload</div>
+            <div class="how-body">Any mix of sources — interviews, tickets, metrics, surveys, PRDs</div>
+          </div>
+          <div class="how-cell">
+            <div class="how-num">02</div>
+            <div class="how-title">AI synthesizes</div>
+            <div class="how-body">Themes extracted, severity scored, goals aligned automatically</div>
+          </div>
+          <div class="how-cell">
+            <div class="how-num">03</div>
+            <div class="how-title">Decide with clarity</div>
+            <div class="how-body">Prioritized backlog and one clear decision to act on</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════ ANALYZE ══════ -->
+    <div class="pg" id="p-analyze">
+      <div class="split">
+
+        <!-- Left: inputs -->
+        <div class="lp">
+          <div class="lp-head">
+            <div class="lp-title">Add your inputs</div>
+            <div class="lp-sub">Open any source — paste text or upload a file. Combine sources for richer analysis.</div>
+          </div>
+
+          <div class="lp-body" id="src-list"></div>
+
+          <div class="lp-goals">
+            <div class="goals-lbl">Business goals <span style="font-size:10px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--ink3)">(optional)</span></div>
+            <div class="goal-wrap" id="goal-wrap"></div>
+          </div>
+
+          <div class="lp-foot">
+            <button class="btn-run" id="btn-run" onclick="runAnalysis()" disabled>Analyze now</button>
+            <div class="run-hint" id="run-hint">Add content above to begin</div>
+          </div>
+        </div>
+
+        <!-- Right: results -->
+        <div class="rp" id="rp">
+
+          <div class="rp-empty" id="rp-empty">
+            <div class="rp-empty-icon">✦</div>
+            <div class="rp-empty-t">Analysis appears here</div>
+            <div class="rp-empty-s">Add content from any source on the left, then click Analyze.</div>
+          </div>
+
+          <div class="rp-spin" id="rp-spin">
+            <div class="spin-r"></div>
+            <div class="spin-t">Analyzing your inputs…</div>
+            <div class="spin-s">Extracting themes · Scoring priorities<br>Generating decision framework</div>
+          </div>
+
+          <div class="rp-res" id="rp-res"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ DECISIONS ══════ -->
+    <div class="pg" id="p-decisions">
+      <div class="pg-inner">
+        <div class="pg-h">Decision Log</div>
+        <div class="pg-s" id="dl-sub">Your saved, evidence-backed product decisions.</div>
+        <div id="dl-list"></div>
+      </div>
+    </div>
+
+    <!-- ══════ GUIDE ══════ -->
+    <div class="pg" id="p-guide">
+      <div class="pg-inner">
+        <div class="pg-h">How to use Clarity</div>
+        <div class="pg-s" style="margin-bottom:36px">Six steps from raw inputs to confident product decisions.</div>
+        <div id="guide-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── DATA ── */
+const SRCS = [
+  { k:'qual',  n:'Qual Interviews',     i:'💬', c:'#7C3AED', cs:'var(--purple-s)',
+    h:'Interview transcripts, user notes',
+    p:'Paste user interview transcripts or research notes…',
+    ex:`User interview – Sarah, Enterprise PM:\n"The onboarding is overwhelming. I had 3 tabs open trying to set up. It took almost an hour to invite my team. With Notion it took 5 minutes. I almost cancelled in week one."\n\nUser interview – Raj, Startup founder:\n"I love the product once you're in, but getting there is painful. The setup wizard disappears mid-flow. I'd love a checklist that tracks my progress."\n\nSupport #2847: Can't find team invite. Same issue reported 11× this week.`
+  },
+  { k:'quant', n:'Analytics / Metrics',  i:'📊', c:'#0284C7', cs:'var(--teal-s)',
+    h:'Funnel data, retention, performance',
+    p:'Paste analytics summaries, funnel reports, or metric data…',
+    ex:`Product Analytics – Q3 2024:\n- Day-1 activation: 38% (target 65%, prev 46%)\n- Time to first value: avg 23 min (target 5 min)\n- P95 dashboard load: 4.2s for enterprise orgs >500 seats\n- Onboarding drop-off at step 3: 61%\n- Week-4 retention: 54% (target 70%)\n- NPS: 31 (target 50)`
+  },
+  { k:'jira',  n:'Jira / Tickets',       i:'🎫', c:'#EA580C', cs:'var(--amber-s)',
+    h:'Bug reports, feature requests, support tickets',
+    p:'Paste Jira tickets, bug reports, or feature requests…',
+    ex:`[JIRA-1024] Can't find team invite during onboarding – 12 duplicates\n[JIRA-987] Dashboard loads 4s+ for large workspaces – 8 linked bugs\n[JIRA-1102] Feature: Bulk export to CSV – 23 votes, Enterprise\n[JIRA-891] Onboarding wizard disappears on browser refresh – 7 reports\n[JIRA-1201] Advanced filtering by power users – 15 comments`
+  },
+  { k:'survey',n:'Survey / NPS',         i:'📋', c:'#059669', cs:'var(--green-s)',
+    h:'NPS verbatims, CSAT comments, open-ends',
+    p:'Paste NPS comments, CSAT responses, or survey open-ends…',
+    ex:`NPS Detractor (3): "Too complex. My team gave up before using it."\nNPS Passive (6): "Works once you know it but the curve is steep."\nNPS Promoter (9): "Powerful analytics once set up. Just needs better onboarding."\nCSAT: "Support was great but the product is hard to configure."`
+  },
+  { k:'prd',   n:'PRD / Persona',        i:'📝', c:'#E11D48', cs:'var(--rose-s)',
+    h:'Requirements, personas, jobs-to-be-done',
+    p:'Paste PRD excerpts, persona descriptions, or JTBD statements…',
+    ex:`Persona: Power User (38% of revenue)\n- Role: Senior PM at mid-market SaaS\n- JTBD: Track team progress, report to exec weekly\n- Pain: Manual data exports for board decks take hours\n- Expects: Bulk export, filtering, role-based views`
+  },
+  { k:'road',  n:'Roadmap / OKRs',       i:'🗺', c:'#65A30D', cs:'var(--lime-s)',
+    h:'Epics, OKRs, strategic themes',
+    p:'Paste roadmap items, epics, or OKR statements…',
+    ex:`Q3 Roadmap:\n- Onboarding revamp (Growth) — Planned\n- Perf optimization enterprise (Infra) — In progress\n- Bulk export (Core product) — Backlog\n- Advanced filtering v2 — Backlog\nOKR: D1 activation 38% → 65% by Q3 end`
+  }
+];
+
+const GOALS = ['Improve retention','Increase activation','Enterprise expansion','Improve NPS / CSAT','Reduce churn','Grow revenue'];
+
+const GUIDE_STEPS = [
+  { n:'01', t:'Open a source panel', d:'On the Analyze page, click any source type — Qual Interviews, Jira, Analytics, Survey, PRD, or Roadmap — to expand it.' },
+  { n:'02', t:'Paste text or upload a file', d:'Type or paste content directly into the text area. Or drag-and-drop .txt, .md, .csv, .json files. Mix multiple sources for deeper analysis.' },
+  { n:'03', t:'Tag your business goals', d:'Select the goals your team is working toward. Each theme and priority item gets scored against these goals.' },
+  { n:'04', t:'Click Analyze now', d:'The AI reads all inputs simultaneously, extracts themes, scores severity, aligns to goals, and generates a prioritized backlog.' },
+  { n:'05', t:'Review your analysis', d:'Get a sharp executive summary, themes with evidence and recommendations, goal alignment scores, and a NOW / NEXT / LATER priority list.' },
+  { n:'06', t:'Save your key decision', d:'Each analysis surfaces the most important decision. Save it to your Decision Log to share with engineering and stakeholders.' }
+];
+
+/* ── STATE ── */
+let dark = false;
+let inputs = {}, files = {}, goals = new Set(), saved = [];
+SRCS.forEach(s => { inputs[s.k] = ''; files[s.k] = []; });
+
+/* ── THEME ── */
+function setTheme(t) {
+  dark = t === 'dark';
+  document.body.className = dark ? 'dark' : '';
+  document.getElementById('tl').className = 'tp-opt' + (!dark ? ' on' : '');
+  document.getElementById('td').className = 'tp-opt' + ( dark ? ' on' : '');
+}
+
+/* ── NAVIGATION ── */
+function go(name) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('p-' + name).classList.add('on');
+  document.getElementById('n-' + name).classList.add('active');
+  if (name === 'decisions') renderDecisions();
+}
+
+/* ── HOME TILES ── */
+function renderHomeTiles() {
+  const g = document.getElementById('home-tiles');
+  SRCS.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'inp-tile';
+    d.style.cssText = `--c:${s.c}; animation:fadeUp .3s ease ${i*.06}s both`;
+    d.title = s.h;
+    d.onclick = () => { go('analyze'); openSrc(s.k); };
+    d.innerHTML = `<span class="inp-icon">${s.i}</span><div class="inp-name">${s.n}</div><div class="inp-desc">${s.h}</div>`;
+    g.appendChild(d);
+  });
+}
+
+/* ── SOURCE ACCORDIONS ── */
+function renderSources() {
+  const c = document.getElementById('src-list');
+  SRCS.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'src'; el.id = 'src-' + s.k;
+    el.style.setProperty('--c', s.c);
+    el.innerHTML = `
+      <div class="src-hd" onclick="toggleSrc('${s.k}')">
+        <div class="src-pip"></div>
+        <span class="src-ico">${s.i}</span>
+        <span class="src-nm">${s.n}</span>
+        <span class="src-ok" id="ok-${s.k}">✓</span>
+        <span class="src-chev">▼</span>
+      </div>
+      <div class="src-bd">
+        <textarea class="src-ta" id="ta-${s.k}" placeholder="${s.p}" oninput="onInput('${s.k}',this.value)"></textarea>
+        <div class="src-row">
+          <span class="src-cnt" id="cnt-${s.k}">0 chars</span>
+          <button class="src-ex" onclick="loadEx('${s.k}')">Load example</button>
+          <button class="src-clr" id="clr-${s.k}" onclick="clrSrc('${s.k}')" style="display:none">Clear</button>
+        </div>
+        <div class="dz" id="dz-${s.k}"
+          ondragover="dzOv(event,'${s.k}')" ondragleave="dzLv('${s.k}')" ondrop="dzDp(event,'${s.k}')"
+          onclick="document.getElementById('fi-${s.k}').click()">
+          <input type="file" id="fi-${s.k}" multiple accept=".txt,.md,.csv,.json,text/*" onchange="handleFiles(this.files,'${s.k}')">
+          <div class="dz-ico">📎</div>
+          <div class="dz-txt"><b>Upload a file</b> or drag it here &middot; .txt .md .csv .json</div>
+        </div>
+        <div class="chps" id="chps-${s.k}"></div>
+      </div>`;
+    c.appendChild(el);
+  });
+}
+
+function toggleSrc(k) { document.getElementById('src-' + k)?.classList.toggle('open'); }
+function openSrc(k)   { document.getElementById('src-' + k)?.classList.add('open'); }
+
+function onInput(k, v) {
+  inputs[k] = v;
+  document.getElementById('cnt-' + k).textContent = v.length + ' chars';
+  const clr = document.getElementById('clr-' + k);
+  if (clr) clr.style.display = v ? '' : 'none';
+  refreshOk(k); updateBtn();
+}
+
+function refreshOk(k) {
+  const has = (inputs[k] || '').trim().length > 0 || (files[k] || []).length > 0;
+  const el = document.getElementById('ok-' + k);
+  if (el) el.className = 'src-ok' + (has ? ' show' : '');
+}
+
+function loadEx(k) {
+  const s = SRCS.find(x => x.k === k); if (!s) return;
+  inputs[k] = s.ex;
+  const ta = document.getElementById('ta-' + k); if (ta) ta.value = s.ex;
+  onInput(k, s.ex); openSrc(k);
+}
+
+function clrSrc(k) {
+  inputs[k] = ''; files[k] = [];
+  const ta = document.getElementById('ta-' + k); if (ta) ta.value = '';
+  const chps = document.getElementById('chps-' + k); if (chps) chps.innerHTML = '';
+  onInput(k, '');
+}
+
+/* ── FILE UPLOAD ── */
+function dzOv(e, k) { e.preventDefault(); document.getElementById('dz-' + k)?.classList.add('drag'); }
+function dzLv(k)    { document.getElementById('dz-' + k)?.classList.remove('drag'); }
+function dzDp(e, k) { e.preventDefault(); dzLv(k); handleFiles(e.dataTransfer.files, k); }
+
+function handleFiles(list, k) {
+  Array.from(list).filter(f => /\.(txt|md|csv|json)$/i.test(f.name) || f.type.startsWith('text/')).forEach(f => {
+    const r = new FileReader();
+    r.onload = e => {
+      files[k].push({ name: f.name, content: e.target.result });
+      inputs[k] = (inputs[k] || '') + `\n\n[File: ${f.name}]\n${e.target.result}`;
+      const ta = document.getElementById('ta-' + k); if (ta) ta.value = inputs[k];
+      onInput(k, inputs[k]); renderChips(k);
+    };
+    r.readAsText(f);
+  });
+}
+
+function renderChips(k) {
+  const c = document.getElementById('chps-' + k); if (!c) return;
+  c.innerHTML = '';
+  (files[k] || []).forEach((f, i) => {
+    const d = document.createElement('div'); d.className = 'chp';
+    d.innerHTML = `📄 ${f.name} <button class="chp-x" onclick="rmFile('${k}',${i})">×</button>`;
+    c.appendChild(d);
+  });
+}
+
+function rmFile(k, i) {
+  files[k].splice(i, 1);
+  let base = inputs[k].replace(/\n\n\[File:.*?\]\n[\s\S]*?(?=\n\n\[File:|$)/g, '').trim();
+  inputs[k] = base + files[k].map(f => `\n\n[File: ${f.name}]\n${f.content}`).join('');
+  const ta = document.getElementById('ta-' + k); if (ta) ta.value = inputs[k];
+  onInput(k, inputs[k]); renderChips(k);
+}
+
+/* ── GOALS ── */
+function renderGoals() {
+  const c = document.getElementById('goal-wrap'); c.innerHTML = '';
+  GOALS.forEach(g => {
+    const b = document.createElement('button');
+    b.className = 'g-btn' + (goals.has(g) ? ' on' : '');
+    b.textContent = g;
+    b.onclick = () => { goals.has(g) ? goals.delete(g) : goals.add(g); renderGoals(); };
+    c.appendChild(b);
+  });
+}
+
+/* ── ANALYZE BUTTON STATE ── */
+function updateBtn() {
+  const filled = SRCS.filter(s => (inputs[s.k] || '').trim().length > 0);
+  const total  = Object.values(inputs).join('').length;
+  const can    = total > 10;
+  const btn    = document.getElementById('btn-run');
+  const hint   = document.getElementById('run-hint');
+  btn.disabled = !can;
+  hint.textContent = can
+    ? `${filled.length} source${filled.length > 1 ? 's' : ''} · ${total.toLocaleString()} chars`
+    : 'Add content above to begin';
+}
+
+/* ── RUN ANALYSIS (Demo Mode) ── */
+async function runAnalysis() {
+  const filled = SRCS.filter(s => (inputs[s.k] || '').trim().length > 0);
+  if (!filled.length) return;
+
+  // Show spinner
+  document.getElementById('rp-empty').style.display = 'none';
+  document.getElementById('rp-res').classList.remove('on');
+  document.getElementById('rp-spin').classList.add('on');
+  const btn = document.getElementById('btn-run');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block;font-size:16px">○</span>';
+
+  // Simulate AI thinking time (2.2 seconds)
+  await new Promise(resolve => setTimeout(resolve, 2200));
+
+  // Realistic demo result based on which sources were filled
+  const srcNames = filled.map(s => s.n).join(', ');
+  const goalList = goals.size ? [...goals] : ['Improve retention', 'Increase activation'];
+
+  const demoResult = {
+    summary: `Across ${filled.length} source${filled.length > 1 ? 's' : ''} (${srcNames}), the most critical finding is a broken onboarding experience that is causing 61% drop-off at the team-invite step — directly suppressing Day-1 activation from a target of 65% down to 38%. A secondary performance issue affecting enterprise accounts compounds the retention problem, with P95 dashboard load times at 4.2 seconds for workspaces over 500 seats.`,
+    themes: [
+      {
+        title: "Onboarding friction blocking activation",
+        severity: "critical",
+        evidence_count: 18,
+        source_keys: ["qual", "quant", "jira", "survey"],
+        description: "61% of new users drop off at the team-invite step (step 3 of onboarding). Average time-to-first-value is 23 minutes vs. a 5-minute target, with the setup wizard disappearing on browser refresh.",
+        quote: "The onboarding is overwhelming. It took almost an hour to invite my team. I almost cancelled in week one.",
+        action: "Redesign onboarding as a persistent progress checklist (not a wizard). Target: reduce time-to-first-value from 23 min to under 8 min, measured at end of next sprint."
+      },
+      {
+        title: "Enterprise dashboard performance degradation",
+        severity: "high",
+        evidence_count: 9,
+        source_keys: ["quant", "jira"],
+        description: "P95 dashboard load time is 4.2 seconds for organisations with 500+ seats, affecting 312 enterprise users. This correlates with Week-4 retention at 54% vs. a 70% target.",
+        quote: "The dashboard is painfully slow for our 600-person org. We've had two executives ask if we should switch tools.",
+        action: "Prioritise infra optimisation sprint targeting sub-1.5s P95 load for enterprise tier. Instrument with real-user monitoring before and after."
+      },
+      {
+        title: "Missing bulk export for power users",
+        severity: "medium",
+        evidence_count: 6,
+        source_keys: ["jira", "prd", "survey"],
+        description: "23 enterprise users have voted for CSV bulk export, representing the Power User persona (38% of revenue). Current workaround is fully manual and takes hours per week.",
+        quote: "I spend 3 hours every Friday manually pulling data for my board deck. This alone might make me switch.",
+        action: "Ship bulk CSV export for the Power User persona in Q3. Scope: filtered export + scheduled delivery. KPI: reduce manual reporting time by 80%."
+      },
+      {
+        title: "NPS gap signals systemic trust deficit",
+        severity: "medium",
+        evidence_count: 5,
+        source_keys: ["survey", "quant"],
+        description: "NPS is 31 against a target of 50. Detractor themes cluster around onboarding complexity and team setup, not core product value — suggesting the product itself is sound but the first-mile experience is broken.",
+        quote: "Works once you know it, but the learning curve is steep. I wouldn't recommend it to a colleague yet.",
+        action: "Run NPS driver analysis to confirm onboarding as root cause. Set NPS 40 as a Q3 milestone gated on onboarding redesign shipping."
+      }
+    ],
+    goal_scores: {
+      "Improve retention":    72,
+      "Increase activation":  88,
+      "Enterprise expansion": 65,
+      "Improve NPS / CSAT":   70,
+      "Reduce churn":         60,
+      "Grow revenue":         55
+    },
+    priorities: [
+      { title: "Onboarding redesign (persistent checklist)", need: 94, impact: 90, effort: "medium", track: "now",  why: "Directly unblocks 61% drop-off at step 3 and is the fastest path to hitting the D1 activation OKR." },
+      { title: "Enterprise dashboard performance",           need: 82, impact: 85, effort: "high",   track: "now",  why: "312 enterprise users are affected; this is a churn risk in the highest-value segment." },
+      { title: "Fix onboarding wizard on browser refresh",   need: 78, impact: 70, effort: "low",    track: "now",  why: "Quick win — 7 bug reports, low effort, directly improves activation metric." },
+      { title: "Bulk CSV export for Power Users",            need: 71, impact: 74, effort: "medium", track: "next", why: "High revenue-segment demand (23 votes); ships after onboarding stabilises." },
+      { title: "Advanced filtering v2",                      need: 55, impact: 58, effort: "high",   track: "later", why: "Desired by power users but lower urgency than the activation and retention blockers." }
+    ],
+    decision: {
+      question: "Should we pause all new feature work and run a focused activation sprint, or continue parallel workstreams?",
+      context: "Day-1 activation at 38% (target 65%) is the single biggest lever on revenue growth. However, the enterprise performance issue is an active churn risk in the highest-value segment.",
+      option_a: "Focused activation sprint — all engineers on onboarding redesign + refresh bug fix for 3 weeks, then rotate to performance.",
+      option_b: "Parallel workstreams — split team between onboarding (60%) and enterprise performance (40%) simultaneously.",
+      recommendation: "Run Option A: a focused 3-week activation sprint. The onboarding drop-off is causing ~150 lost activations per week at current traffic. Fixing it first compounds — better activation improves the cohort that then hits the performance issue. Measure D1 activation daily; if it reaches 55% by week 2, pull one engineer to start performance groundwork early."
+    },
+    confidence: "high",
+    confidence_note: "Multiple corroborating sources (qualitative, quantitative, tickets, and survey) all point to the same root cause with specific, measurable data points."
+  };
+
+  document.getElementById('rp-spin').classList.remove('on');
+  btn.disabled = false;
+  btn.innerHTML = 'Analyze now';
+
+  // Show demo banner then render
+  const res = document.getElementById('rp-res');
+  res.innerHTML = `<div style="
+    display:flex;align-items:center;gap:10px;
+    background:var(--amber-s);border:1px solid color-mix(in srgb,var(--amber) 25%,transparent);
+    border-radius:9px;padding:11px 16px;margin-bottom:24px;
+    font-size:12.5px;color:var(--amber);line-height:1.5;
+  ">
+    <span style="font-size:16px;flex-shrink:0">✦</span>
+    <span><strong>Demo mode</strong> — This is a realistic sample analysis so you can preview the full experience. When you connect the AI, results will be generated live from your actual inputs.</span>
+  </div>` + res.innerHTML;
+
+  renderResults(demoResult);
+}
+
+/* ── RENDER RESULTS ── */
+function renderResults(r) {
+  const el  = document.getElementById('rp-res');
+  const sev = { critical:'sev-c', high:'sev-h', medium:'sev-m', low:'sev-l' };
+  const sc  = { critical:'var(--red)', high:'var(--amber)', medium:'var(--blue)', low:'var(--green)' };
+
+  // Themes
+  const themes = (r.themes || []).map((t, i) => `
+    <div class="th-card" style="--sc:${sc[t.severity]||'var(--blue)'};animation-delay:${i*.06}s">
+      <div class="th-top">
+        <div class="th-nm">${t.title}</div>
+        <span class="sev ${sev[t.severity]||'sev-m'}">${t.severity}</span>
+      </div>
+      <div class="th-desc">${t.description}</div>
+      ${t.quote ? `<div class="th-quote">"${t.quote}"</div>` : ''}
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:8px;padding-left:12px">${t.evidence_count} signal${t.evidence_count !== 1 ? 's' : ''}</div>
+      <div class="th-action">→ ${t.action}</div>
+    </div>`).join('');
+
+  // Scores
+  const scores = Object.entries(r.goal_scores || {}).map(([g, v]) => {
+    const bc = v >= 70 ? 'var(--green)' : v >= 40 ? 'var(--blue)' : 'var(--ink3)';
+    return `<div class="sc-row">
+      <div class="sc-nm">${g}</div>
+      <div class="sc-bar"><div class="sc-fill" style="width:${v}%;background:${bc}"></div></div>
+      <div class="sc-val">${v}</div>
+    </div>`;
+  }).join('');
+
+  // Priorities
+  const pris = (r.priorities || []).map((p, i) => {
+    const tc = p.track === 'now' ? 'tr-now' : p.track === 'next' ? 'tr-next' : 'tr-later';
+    const ec = p.effort === 'low' ? 'e-lo' : p.effort === 'high' ? 'e-hi' : 'e-md';
+    return `<div class="pri-row" style="animation-delay:${i*.05}s">
+      <span class="track ${tc}">${p.track}</span>
+      <div>
+        <div class="pri-nm">${p.title}</div>
+        <div class="pri-why">${p.why}</div>
+        <div class="pri-meta">
+          <span>Need <b style="color:var(--ink2)">${p.need}</b></span>
+          <span>Impact <b style="color:var(--ink2)">${p.impact}</b></span>
+          <span class="${ec}">Effort: ${p.effort}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Decision
+  const d = r.decision || {};
+
+  el.innerHTML = `
+    <span class="conf ${r.confidence || 'medium'}">
+      <span class="conf-dot"></span>${r.confidence || 'medium'} confidence
+    </span>
+
+    <div class="res-sum">${r.summary}</div>
+
+    <div class="res-lbl">Identified themes</div>
+    ${themes}
+
+    <div style="margin-top:28px">
+      <div class="res-lbl">Business goal alignment</div>
+      ${scores}
+    </div>
+
+    <div style="margin-top:28px">
+      <div class="res-lbl">Prioritized actions</div>
+      ${pris}
+    </div>
+
+    <div style="margin-top:28px">
+      <div class="res-lbl">Key decision</div>
+      <div class="dec">
+        <div class="dec-q">${d.question}</div>
+        <div class="dec-ctx">${d.context}</div>
+        <div class="dec-opts">
+          <div class="dec-opt"><div class="dec-opt-l">Option A</div><div class="dec-opt-v">${d.option_a}</div></div>
+          <div class="dec-opt"><div class="dec-opt-l">Option B</div><div class="dec-opt-v">${d.option_b}</div></div>
+        </div>
+        <div class="dec-rec">
+          <div class="dec-rec-l">Recommendation</div>
+          <div class="dec-rec-v">${d.recommendation}</div>
+        </div>
+        <button class="btn-save" onclick='saveResult(${JSON.stringify(r).replace(/'/g,"&#39;").replace(/"/g,"&quot;")})'>Save to Decision Log</button>
+      </div>
+    </div>
+
+    ${r.confidence_note ? `<div style="margin-top:14px;font-size:11.5px;color:var(--ink3);font-style:italic;border-top:1px solid var(--line);padding-top:14px">Note: ${r.confidence_note}</div>` : ''}
+  `;
+
+  el.classList.add('on');
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── SAVE / DECISIONS ── */
+function saveResult(r) {
+  if (typeof r === 'string') try { r = JSON.parse(r); } catch(e) { return; }
+  saved.unshift(r);
+  const b = document.getElementById('badge');
+  b.textContent = saved.length; b.style.display = 'inline-flex';
+  toast('Saved to Decision Log ✓');
+}
+
+function renderDecisions() {
+  const list = document.getElementById('dl-list');
+  const sub  = document.getElementById('dl-sub');
+  list.innerHTML = '';
+
+  if (!saved.length) {
+    sub.textContent = 'Your saved, evidence-backed product decisions.';
+    list.innerHTML = `<div class="dl-empty">
+      <div class="dl-empty-ico">◎</div>
+      <div class="dl-empty-h">No decisions saved yet</div>
+      <div class="dl-empty-p">Analyze inputs and click "Save to Decision Log" to build your evidence library.</div>
+      <button class="btn-primary" onclick="go('analyze')">Go to Analyze →</button>
+    </div>`;
+    return;
+  }
+
+  sub.textContent = `${saved.length} decision${saved.length > 1 ? 's' : ''} — grounded in evidence and business goals.`;
+  saved.forEach((a, i) => {
+    const d    = a.decision || {};
+    const tags = (a.themes || []).slice(0, 4).map(t =>
+      `<span class="dl-tag">${t.severity === 'critical' ? '🔴' : t.severity === 'high' ? '🟠' : '🟡'} ${t.title}</span>`
+    ).join('');
+    const el   = document.createElement('div');
+    el.className = 'dl-card'; el.style.animationDelay = `${i * .05}s`;
+    el.innerHTML = `
+      <div class="dl-id">D-${String(i + 1).padStart(3, '0')}</div>
+      <div class="dl-q">${d.question || 'Decision'}</div>
+      <div class="dl-ctx">${d.context || ''}</div>
+      <div class="dl-opts">
+        <div class="dl-opt"><div class="dl-opt-l">Option A</div><div class="dl-opt-v">${d.option_a || ''}</div></div>
+        <div class="dl-opt"><div class="dl-opt-l">Option B</div><div class="dl-opt-v">${d.option_b || ''}</div></div>
+      </div>
+      <div class="dl-rec"><strong>Recommendation:</strong> ${d.recommendation || ''}</div>
+      ${tags ? `<div class="dl-tags">${tags}</div>` : ''}`;
+    list.appendChild(el);
+  });
+}
+
+/* ── GUIDE ── */
+function renderGuide() {
+  const c = document.getElementById('guide-list');
+  GUIDE_STEPS.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'g-step'; d.style.animationDelay = `${i * .06}s`;
+    d.innerHTML = `<div class="g-num">${s.n}</div><div><div class="g-title">${s.t}</div><div class="g-desc">${s.d}</div></div>`;
+    c.appendChild(d);
+  });
+}
+
+/* ── TOAST ── */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2800);
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  renderHomeTiles();
+  renderSources();
+  renderGoals();
+  renderGuide();
+  updateBtn();
+});
+</script>
+</body>
+</html>
